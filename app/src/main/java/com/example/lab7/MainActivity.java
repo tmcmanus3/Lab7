@@ -5,6 +5,9 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import android.app.Notification;
+import android.app.PendingIntent;
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -53,12 +56,24 @@ public class MainActivity extends AppCompatActivity {
         String titleContent = title.getText().toString();
         String messageContent = message.getText().toString();
 
+        Intent activityIntent = new Intent(this, MainActivity.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, activityIntent, 0);
+
+        Intent broadcastIntent = new Intent(this, NotificationReceiver.class);
+        broadcastIntent.putExtra("toastMessage", messageContent);
+        PendingIntent actionIntent = PendingIntent.getBroadcast(this, 0, broadcastIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
         Notification notification = new NotificationCompat.Builder(this, App.CHANNEL_1_ID)
-                .setSmallIcon(R.drawable.ic_launcher_background)
+                .setSmallIcon(R.drawable.ic_high_priority)
                 .setContentTitle(titleContent)
                 .setContentText(messageContent)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                .setColor(Color.BLUE)
+                .setContentIntent(contentIntent)
+                .setAutoCancel(true)
+                .setOnlyAlertOnce(true)
+                .addAction(R.mipmap.ic_launcher, "Toast", actionIntent)
                 .build();
         Log.i(titleContent, messageContent);
         notificationManager.notify(1,notification);
@@ -69,13 +84,13 @@ public class MainActivity extends AppCompatActivity {
         String messageContent = message.getText().toString();
 
         Notification notification = new NotificationCompat.Builder(this, App.CHANNEL_2_ID)
-                .setSmallIcon(R.drawable.ic_launcher_background)
+                .setSmallIcon(R.drawable.ic_low_priority)
                 .setContentTitle(titleContent)
                 .setContentText(messageContent)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setCategory(NotificationCompat.CATEGORY_MESSAGE)
                 .build();
         Log.i(titleContent, messageContent);
-        notificationManager.notify(1,notification);
+        notificationManager.notify(2,notification);
     }
 }
